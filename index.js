@@ -23,8 +23,7 @@ mongoose.connect(
 
     app.get('/', (req, res) => {
         res.setHeader('Content-Type', 'application/json');
-        //return res.status(200).json({msg: "Rota pública"})
-        return res.status(200).send(JSON.stringify({msg: "Rota pública"}))
+        return res.status(200).json({msg: "Rota pública"});
     })
     app.use('/auth', authRoutes);
     app.use('/usuario', usuarioRoutes);
