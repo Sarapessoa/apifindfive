@@ -1,9 +1,12 @@
 import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
+import session from 'express-session';
+import passport from "passport";
 import mongoose from "mongoose";
 import authRoutes from './routes/authRoutes.js';
 import usuarioRoutes from './routes/usuarioRoutes.js';
+import { authWithGoogle } from './controllers/authController.js';
 
 dotenv.config();
 
@@ -15,7 +18,24 @@ app.use(express.json());
 app.use(cors({
     methods: 'GET,POST,PUT,DELETE',
     allowedHeaders: 'Content-Type,Authorization'
-  }));
+}));
+app.use(
+    session({
+        secret: process.env.SECRET,
+        resave: false,
+        saveUninitialized: false
+    })
+);
+app.use(passport.initialize());
+app.use(passport.session());
+passport.serializeUser((user, done) => {
+  done(null, user);
+});
+passport.deserializeUser((user, done) => {
+  done(null, user);
+});
+
+authWithGoogle();
 
 app.get('/', (req, res) => {
     res.setHeader('Content-Type', 'application/json');

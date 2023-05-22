@@ -1,7 +1,9 @@
 import jwt from "jsonwebtoken";
+import passport from "passport";
 import bcrypt from "bcryptjs";
 import nodemailer from "nodemailer";
 import Usuario from "../models/Usuario.js";
+import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import {validacao} from "../utils/validacao.js";
 
 export const auth = async (req, res) => {
@@ -133,4 +135,89 @@ export const resetSenha = async (req, res) => {
         console.log('Email enviado:', info.response);
         res.status(200).json({ msg: 'Email enviado com sucesso!' });
     });   
+}
+export const authWithGoogle = () => {
+    const keyID = process.env.GOOGLE_ID_CLIENT
+    const keySecret = process.env.GOOGLE_SECRET_CLIENT
+
+    passport.use(
+      new GoogleStrategy(
+        {
+          clientID: keyID,
+          clientSecret: keySecret,
+          callbackURL: '/auth/google/callback'
+        },
+        async (accessToken, refreshToken, profile, done) => {
+          try {
+            
+  
+            return done(null, profile);
+          } catch (error) {
+            return done(error);
+          }
+        }
+      )
+    );
+};
+
+// Rota de autenticação com o Google
+export const authenticateWithGoogle = passport.authenticate('google', {
+    scope: ['profile', 'email']
+});
+
+// Rota de callback após a autenticação
+export const googleCallback = async (req, res) => {
+    passport.authenticate('google', async (err, user) => {
+      if (err) {
+        return res.status(500).json({ error: 'Erro ao autenticar com o Google.' });
+      }
+  
+      if (!user) {
+        return res.status(401).json({ error: 'Autenticação falhou. Usuário não encontrado.' });
+      }
+  
+      const response = {
+        userId: user.id,
+        name: user.displayName,
+        email: user.emails[0].value,
+      };
+
+      const checkUsuario = await Usuario.findOne({email: response.email});
+
+      if(!checkUsuario){
+        registerGoogle(response.name, response.email)
+      }
+
+      try{
+            const secret = process.env.SECRET;
+
+            const token = jwt.sign({
+                _id: checkUsuario._id
+
+            }, secret, {expiresIn: '3h'})
+
+            res.status(200).json({msg: "Autenticação realizada com sucesso!", token: token})
+        }
+        catch(erro){
+            return res.status(500).json({msg: "Erro!"})
+        }
+    })(req, res);
+}
+
+const registerGoogle = async (nome, email) => {
+    const salt = await bcrypt.genSalt(12);
+    const senhaHash = await bcrypt.hash("", salt);
+
+    const usuario = new Usuario({
+        nome: nome,
+        email: email,
+        senha: senhaHash
+    })
+
+    try{
+        await usuario.save();
+    }
+    catch(erro){
+        return res.status(500).json({msg: "Erro!"})
+    } 
 }
