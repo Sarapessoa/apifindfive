@@ -91,7 +91,7 @@ export const resetSenha = async (req, res) => {
 
     const token = jwt.sign({ email }, secret, { expiresIn: '20m' });
 
-    const url = 'http://127.0.0.1:5500/pages/atualizar-senha.html';
+    const url = 'https://yanacm.github.io/Find-Five/pages/atualizar-senha.html';
 
     const resetLink = `${url}?token=${token}`;
 
