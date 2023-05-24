@@ -196,7 +196,10 @@ export const googleCallback = async (req, res) => {
 
             }, secret, {expiresIn: '3h'})
 
-            res.status(200).json({msg: "Autenticação realizada com sucesso!", token: token})
+            //TESTE
+            /*const redirectURL = `http://127.0.0.1:5500/pages/logar.html?token=${token}`;*/
+            const redirectURL = `https://yanacm.github.io/Find-Five/pages/logar.html?token=${token}`;
+            return res.redirect(redirectURL);
         }
         catch(erro){
             return res.status(500).json({msg: "Erro!"})
