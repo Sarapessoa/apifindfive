@@ -93,9 +93,9 @@ export const resetSenha = async (req, res) => {
 
     const token = jwt.sign({ email }, secret, { expiresIn: '20m' });
 
-    const url = 'https://yanacm.github.io/Find-Five/pages/atualizar-senha.html';
+    const urlSite = process.env.URL_SITE
 
-    const resetLink = `${url}?token=${token}`;
+    const resetLink = `${urlSite}/Find-Five/pages/atualizar-senha.html?token=${token}`;
 
     const emailContent = `
         <!DOCTYPE html>
@@ -196,8 +196,6 @@ export const googleCallback = async (req, res) => {
 
             }, secret, {expiresIn: '3h'})
 
-            //TESTE
-            /*const redirectURL = `http://127.0.0.1:5500/pages/logar.html?token=${token}`;*/
             const redirectURL = `https://yanacm.github.io/Find-Five/pages/logar.html?token=${token}`;
             return res.redirect(redirectURL);
         }

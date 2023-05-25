@@ -12,12 +12,14 @@ dotenv.config();
 
 const dbUser = process.env.DB_USER;
 const dbPass = process.env.DB_PASS;
+const urlSite = process.env.URL_SITE
 
 const app = express();
 app.use(express.json());
 app.use(cors({
     methods: 'GET,POST,PUT,DELETE',
-    allowedHeaders: 'Content-Type,Authorization'
+    allowedHeaders: 'Content-Type,Authorization',
+    origin: urlSite
 }));
 app.use(
     session({
