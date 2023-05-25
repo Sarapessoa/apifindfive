@@ -81,7 +81,7 @@ export const logout = async (req, res) => {
 export const resetSenha = async (req, res) => {
     const { email } = req.body;
 
-    validacao(res, email, "O email é obrigatório")
+    validacao(res, email, "O email é obrigatório!")
 
     const usuario = await Usuario.findOne({email: email});
 
