@@ -67,21 +67,16 @@ export const login = async (req, res) => {
 
         }, secret, {expiresIn: '3h'})
 
-        res.status(200).json({msg: "Autenticação realizada com sucesso!", token: token})
+        res.status(200).json({msg: "Autenticação realizada com sucesso!", token: token});
     }
     catch(erro){
-        return res.status(500).json({msg: "Erro!"})
+        return res.status(500).json({msg: "Erro!"});
     }
-}
-export const logout = async (req, res) => {
-    // nao sei oq fazer aqui
-
-    return res.status(200).json({msg: "Usuário desligado"})
 }
 export const resetSenha = async (req, res) => {
     const { email } = req.body;
 
-    validacao(res, email, "O email é obrigatório!")
+    validacao(res, email, "O email é obrigatório!");
 
     const usuario = await Usuario.findOne({email: email});
 
@@ -113,11 +108,12 @@ export const resetSenha = async (req, res) => {
     `
 
     const transporter = nodemailer.createTransport({
-        service: 'Hotmail',
+        service: 'hotmail',
         auth: {
           user: emailUser,
           pass: emailPass
-        }
+        },
+        greetingTimeout: 90000
     });
 
     const mailOptions = {
@@ -133,7 +129,7 @@ export const resetSenha = async (req, res) => {
             return res.status(500).json({ msg: 'Erro ao enviar o email!' });
         }
         console.log('Email enviado:', info.response);
-        res.status(200).json({ msg: 'Email enviado com sucesso!' });
+        res.status(200).json({ msg: `Link enviado com sucesso para o email ${email}!` });
     });   
 }
 export const authWithGoogle = () => {
@@ -150,8 +146,7 @@ export const authWithGoogle = () => {
         },
         async (accessToken, refreshToken, profile, done) => {
           try {
-  
-            return done(null, profile);
+            return done(null, profile, accessToken);
           } catch (error) {
             return done(error);
           }
@@ -162,12 +157,13 @@ export const authWithGoogle = () => {
 
 // Rota de autenticação com o Google
 export const authenticateWithGoogle = passport.authenticate('google', {
-    scope: ['profile', 'email']
+    scope: ['profile', 'email'],
+    prompt: 'select_account'
 });
 
 // Rota de callback após a autenticação
 export const googleCallback = async (req, res) => {
-    passport.authenticate('google', async (err, user) => {
+    passport.authenticate('google', async (err, user, accessToken) => {
       if (err) {
         return res.status(500).json({ error: 'Erro ao autenticar com o Google.' });
       }
@@ -175,7 +171,6 @@ export const googleCallback = async (req, res) => {
       if (!user) {
         return res.status(401).json({ error: 'Autenticação falhou. Usuário não encontrado.' });
       }
-  
       const response = {
         userId: user.id,
         name: user.displayName,
@@ -195,8 +190,7 @@ export const googleCallback = async (req, res) => {
                 _id: checkUsuario._id
 
             }, secret, {expiresIn: '3h'})
-
-            const redirectURL = `https://yanacm.github.io/Find-Five/pages/logar.html?token=${token}`;
+            const redirectURL = `https://yanacm.github.io/Find-Five/pages/logar.html?token=${token}&tokenGoogle=${accessToken}`;
             return res.redirect(redirectURL);
         }
         catch(erro){
