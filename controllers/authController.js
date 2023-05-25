@@ -145,11 +145,11 @@ export const authWithGoogle = () => {
         {
           clientID: keyID,
           clientSecret: keySecret,
+          scope: ['profile', 'email'],
           callbackURL: '/auth/google/callback'
         },
         async (accessToken, refreshToken, profile, done) => {
           try {
-            
   
             return done(null, profile);
           } catch (error) {
