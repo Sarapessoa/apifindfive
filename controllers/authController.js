@@ -49,7 +49,13 @@ export const register = async (req, res) => {
     
             }, secret, {expiresIn: '1h'});
 
-            const response = axios.post('https://find-five-api-n9nm.vercel.app', {}, {
+            const res = axios.post('https://find-five-api-n9nm.vercel.app/estatisticas', {}, {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            });
+
+            const response = axios.post('https://find-five-api-n9nm.vercel.app/tentativas', {}, {
                 headers: {
                     'Authorization': 'Bearer ' + token
                 }
