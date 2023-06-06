@@ -18,7 +18,7 @@ export const deleteUsuario = async (req, res) => {
     const id = req.params.id;
 
     try {
-        const usuario = await Usuario.findByIdAndRemove(id);
+        const usuario = await Usuario.findByIdAndDelete(id);
 
         if(!usuario) return res.status(404).json({msg: "Usuário não registrado"});
 

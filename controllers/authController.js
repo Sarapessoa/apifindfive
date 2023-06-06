@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import passport from "passport";
 import bcrypt from "bcryptjs";
+import axios from "axios";
 import nodemailer from "nodemailer";
 import Usuario from "../models/Usuario.js";
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
@@ -39,6 +40,23 @@ export const register = async (req, res) => {
 
     try{
         await usuario.save();
+
+        try {
+            const secret = process.env.SECRET;
+
+            const token = jwt.sign({
+                _id: usuario._id
+    
+            }, secret, {expiresIn: '1h'});
+
+            const response = axios.post('https://find-five-api-n9nm.vercel.app', {}, {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            });
+        } catch (error) {
+            return res.status(400).json({msg: "Não foi possível fazer o cadastro!"});
+        }
         return res.status(200).json({msg: "Usuário registrado com sucesso!"});
     }
     catch(erro){
@@ -67,7 +85,7 @@ export const login = async (req, res) => {
 
         }, secret, {expiresIn: '3h'})
 
-        res.status(200).json({msg: "Autenticação realizada com sucesso!", token: token});
+        return res.status(200).json({msg: "Autenticação realizada com sucesso!", token: token});
     }
     catch(erro){
         return res.status(500).json({msg: "Erro!"});
