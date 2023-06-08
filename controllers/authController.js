@@ -66,14 +66,14 @@ export const register = async (req, res) => {
         return res.status(200).json({msg: "Usuário registrado com sucesso!"});
     }
     catch(erro){
-        return res.status(500).json({msg: "Erro!"})
+        return res.status(500).json({msg: "Erro ao realizar o cadastro!"})
     }
 }
 export const login = async (req, res) => {
     const {email, senha} = req.body;
 
-    validacao(res, email, "Email é obrigatório");
-    validacao(res, senha, "Senha é obrigatório");
+    validacao(email, "Email é obrigatório");
+    validacao(senha, "Senha é obrigatório");
 
     const checkUsuario = await Usuario.findOne({email: email});
 
@@ -235,8 +235,31 @@ const registerGoogle = async (nome, email) => {
 
     try{
         await usuario.save();
+
+        try {
+            const secret = process.env.SECRET;
+
+            const token = jwt.sign({
+                _id: usuario._id
+    
+            }, secret, {expiresIn: '1h'});
+
+            const res = await axios.post('https://find-five-api-n9nm.vercel.app/estatisticas', {}, {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            });
+
+            const response = await axios.post('https://find-five-api-n9nm.vercel.app/tentativas', {}, {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            });
+        } catch (error) {
+            return res.status(400).json({msg: "Não foi possível fazer o cadastro!"});
+        }
     }
     catch(erro){
-        return res.status(500).json({msg: "Erro!"})
-    } 
+        return res.status(500).json({msg: "Erro ao realizar o cadastro!"})
+    }
 }
