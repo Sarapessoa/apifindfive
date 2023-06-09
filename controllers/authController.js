@@ -207,11 +207,13 @@ export const googleCallback = async (req, res) => {
         registerGoogle(response.name, response.email)
       }
 
-      try{
+      try{  
+            const usuario = await Usuario.findOne({email: response.email});
+
             const secret = process.env.SECRET;
 
             const token = jwt.sign({
-                _id: checkUsuario._id
+                _id: usuario._id
 
             }, secret, {expiresIn: '3h'})
             const redirectURL = `https://yanacm.github.io/Find-Five/pages/logar.html?token=${token}&tokenGoogle=${accessToken}`;
