@@ -16,9 +16,9 @@ export const register = async (req, res) => {
     const {nome, email, senha} = req.body;
 
     try {
-        validacao(nome, "Nome é obrigatório");
-        validacao(email, "Email é obrigatório");
-        validacao(senha, "Senha é obrigatório");
+        validacao(nome, "Nome é obrigatório!");
+        validacao(email, "Email é obrigatório!");
+        validacao(senha, "Senha é obrigatório!");
         
     } catch (error) {
         return res.status(422).json({ msg: error.message });
@@ -72,8 +72,8 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
     const {email, senha} = req.body;
 
-    validacao(email, "Email é obrigatório");
-    validacao(senha, "Senha é obrigatório");
+    validacao(email, "Email é obrigatório!");
+    validacao(senha, "Senha é obrigatório!");
 
     const checkUsuario = await Usuario.findOne({email: email});
 
